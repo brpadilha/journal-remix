@@ -1,3 +1,17 @@
+import { Form, redirect } from "@remix-run/react";
+import { ActionFunctionArgs } from "@remix-run/node";
+
+export async function action({ request }: ActionFunctionArgs) {
+  // this is on serverSide
+  console.log(request);
+  const formData = await request.formData();
+  const json = Object.fromEntries(formData.entries());
+
+  console.log(json);
+
+  return redirect("/");
+}
+
 export default function Index() {
   return (
     <div className="p-10">
@@ -6,7 +20,7 @@ export default function Index() {
         Doing and learnings. Update weekly.
       </p>
       <div className="my-8 border p-2">
-        <form>
+        <Form method="post">
           <p className="italic">Create an entry</p>
           <div>
             <div className="mt-4">
@@ -55,7 +69,7 @@ export default function Index() {
               </div>
             </div>
           </div>
-        </form>
+        </Form>
       </div>
 
       <div className="mt-4">

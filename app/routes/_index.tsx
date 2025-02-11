@@ -1,13 +1,24 @@
-import { Form, redirect } from "@remix-run/react";
+import { PrismaClient } from "@prisma/client";
 import { ActionFunctionArgs } from "@remix-run/node";
+import { Form, redirect } from "@remix-run/react";
 
 export async function action({ request }: ActionFunctionArgs) {
-  // this is on serverSide
-  console.log(request);
-  const formData = await request.formData();
-  const json = Object.fromEntries(formData.entries());
+  const db = new PrismaClient();
 
-  console.log(json);
+  const formData = await request.formData();
+  const data = Object.fromEntries(formData.entries()) as {
+    date: string;
+    type: string
+    text: string;
+  }
+
+  await db.entry.create({
+    data: {
+      date: new Date(data.date),
+      type: data.type,
+      text: data.text,
+    },
+  })
 
   return redirect("/");
 }
@@ -32,7 +43,7 @@ export default function Index() {
                   className="mr-2"
                   type="radio"
                   value="work"
-                  name="category"
+                  name="type"
                 />
                 Work
               </label>
@@ -41,7 +52,7 @@ export default function Index() {
                   className="mr-2"
                   type="radio"
                   value="learning"
-                  name="category"
+                  name="type"
                 />
                 Learning
               </label>
@@ -50,7 +61,7 @@ export default function Index() {
                   className="mr-2"
                   type="radio"
                   value="interesting-things"
-                  name="category"
+                  name="type"
                 />
                 Interesting things
               </label>
@@ -58,7 +69,7 @@ export default function Index() {
 
             <div className="mt-2">
               <textarea
-                name="entry"
+                name="text"
                 placeholder="Write your entry..."
                 className="w-full text-gray-700"
               />

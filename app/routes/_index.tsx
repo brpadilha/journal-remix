@@ -6,19 +6,27 @@ export async function action({ request }: ActionFunctionArgs) {
   const db = new PrismaClient();
 
   const formData = await request.formData();
-  const data = Object.fromEntries(formData.entries()) as {
+  const { date, type, text } = Object.fromEntries(formData.entries()) as {
     date: string;
-    type: string
+    type: string;
     text: string;
+  };
+
+  if (
+    typeof date !== "string" ||
+    typeof type !== "string" ||
+    typeof text !== "string"
+  ) {
+    throw new Error("Bad request");
   }
 
   await db.entry.create({
     data: {
-      date: new Date(data.date),
-      type: data.type,
-      text: data.text,
+      date: new Date(date),
+      type: type,
+      text: text,
     },
-  })
+  });
 
   return redirect("/");
 }
@@ -39,12 +47,7 @@ export default function Index() {
             </div>
             <div className="space-x-6 mt-2">
               <label>
-                <input
-                  className="mr-2"
-                  type="radio"
-                  value="work"
-                  name="type"
-                />
+                <input className="mr-2" type="radio" value="work" name="type" />
                 Work
               </label>
               <label>
@@ -74,7 +77,10 @@ export default function Index() {
                 className="w-full text-gray-700"
               />
               <div className="mt-2 text-right">
-                <button className="bg-blue-500 py-1 px-4 font-medium text-white" type="submit">
+                <button
+                  className="bg-blue-500 py-1 px-4 font-medium text-white"
+                  type="submit"
+                >
                   Save
                 </button>
               </div>
